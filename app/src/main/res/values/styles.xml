@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="NotesListTextStyle">
+        <item name="android:layout_marginBottom">@dimen/margin_extra_small</item>
+    </style>
+    <style name="NotesListTextStyle.Date">
+        <item name="android:textAlignment">textEnd</item>
+        <item name="android:textSize">@dimen/date_note_list_text_size</item>
+        <item name="android:textColor">@color/grey_violet_400</item>
+    </style>
+    <style name="NotesListTextStyle.Title">
+        <item name="android:textSize">@dimen/title_note_list_text_size</item>
+        <item name="android:textColor">@color/grey_violet_600</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="NotesListTextStyle.Contents">
+        <item name="android:textSize">@dimen/contents_note_list_text_size</item>
+        <item name="android:textColor">@color/grey_violet_600</item>
+        <item name="android:maxLines">2</item>
+    </style>
+
+    <style name="NoteScreenTextStyle">
+        <item name="android:layout_marginLeft">@dimen/margin_default</item>
+        <item name="android:layout_marginRight">@dimen/margin_default</item>
+    </style>
+    <style name="NoteScreenTextStyle.Date">
+        <item name="android:layout_marginTop">@dimen/margin_default</item>
+        <item name="android:textAlignment">textEnd</item>
+        <item name="android:textSize">@dimen/date_note_screen_text_size</item>
+        <item name="android:textColor">@color/grey_violet_400</item>
+    </style>
+    <style name="NoteScreenTextStyle.Title">
+        <item name="android:layout_marginTop">@dimen/margin_extra_small</item>
+        <item name="android:textSize">@dimen/title_note_screen_text_size</item>
+        <item name="android:textColor">@color/grey_violet_600</item>
+        <item name="android:textColorHint">@color/grey_violet_600</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:maxLines">1</item>
+    </style>
+    <style name="NoteScreenTextStyle.Contents">
+        <item name="android:layout_marginTop">@dimen/margin_extra_small</item>
+        <item name="android:textSize">@dimen/contents_note_screen_text_size</item>
+        <item name="android:textColor">@color/grey_violet_600</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="FloatingButtonStyle">
+        <item name="android:layout_margin">@dimen/margin_default</item>
+        <item name="android:layout_gravity">bottom|end</item>
+        <item name="srcCompat">@drawable/ic_baseline_add_24</item>
+    </style>
+
+    <style name="NoteCardViewStyle">
+        <item name="android:layout_marginTop">@dimen/margin_default</item>
+        <item name="android:layout_marginLeft">@dimen/margin_default</item>
+        <item name="android:layout_marginRight">@dimen/margin_default</item>
+        <item name="cornerRadius">@dimen/card_view_corner_radius</item>
+        <item name="android:backgroundTint">@color/white</item>
+    </style>
+</resources>

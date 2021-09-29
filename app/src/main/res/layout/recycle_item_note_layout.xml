@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/NoteCardViewStyle">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_small">
+
+        <TextView
+            android:id="@+id/note_date_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/NotesListTextStyle.Date"
+            tools:text="29 сентября" />
+
+        <TextView
+            android:id="@+id/note_title_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/NotesListTextStyle.Title"
+            tools:text="Невероятно ненужный заголовок" />
+
+        <TextView
+            android:id="@+id/note_contents_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/NotesListTextStyle.Contents"
+            tools:text="Съешь ещё этих мягких французских булок да выпей же чаю" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,22 +1,30 @@
-package ru.gb.androidstart.notes;
+package ru.gb.androidstart.notes.domain;
 
 import java.util.Date;
 
+import androidx.annotation.Nullable;
+
 public class NoteEntity {
-    private final int id;
+
+    private int id;
     private String title;
     private String contents;
     private Date date;
+    private static int counter = 0;
 
-    public NoteEntity(int id, String title, String contents) {
-        this.id = id;
+    public NoteEntity(String title, String contents) {
+        this.id = ++counter;
         this.title = title;
         this.contents = contents;
         this.date = new Date();
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {

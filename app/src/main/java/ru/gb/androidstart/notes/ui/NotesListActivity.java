@@ -40,10 +40,19 @@ public class NotesListActivity extends AppCompatActivity {
 
     private void setClickListeners() {
         addNoteButton.setOnClickListener(v -> openNewNote());
+        notesAdapter.setOnItemClickListener(this::onItemClick);
+    }
+
+    private void onItemClick(NoteEntity item) {
+        openSelectedNote(item);
     }
 
     private void openNewNote() {
         NoteScreenActivity.openNewNote(this);
+    }
+
+    private void openSelectedNote(NoteEntity note) {
+        NoteScreenActivity.openSelectedNote(this, note);
     }
 
     private void addTestNotes() {

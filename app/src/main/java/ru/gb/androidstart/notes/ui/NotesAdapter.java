@@ -17,6 +17,8 @@ import ru.gb.androidstart.notes.domain.NoteEntity;
 
 public class NotesAdapter extends RecyclerView.Adapter<NoteViewHolder> {
 
+    private OnItemClickListener clickListener = null;
+
     private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
 
         @Override
@@ -46,6 +48,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
         NoteEntity note = getItem(position);
+        holder.itemView.setOnClickListener(v -> clickListener.onItemClick(note));
         holder.titleTextView.setText(note.getTitle());
         holder.contentsTextView.setText(note.getContents());
         holder.dateTextView.setText(dateFormat.format(note.getDate()));
@@ -58,5 +61,13 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteViewHolder> {
     @Override
     public int getItemCount() {
         return data.size();
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        clickListener = listener;
+    }
+
+    interface OnItemClickListener {
+        void onItemClick(NoteEntity item);
     }
 }

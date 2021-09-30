@@ -1,7 +1,6 @@
 package ru.gb.androidstart.notes.impl;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import ru.gb.androidstart.notes.domain.NoteEntity;
 import ru.gb.androidstart.notes.domain.NotesStorage;
@@ -11,7 +10,7 @@ public class NotesStorageImpl implements NotesStorage {
     private int counter = 0;
 
     @Override
-    public List<NoteEntity> getNotesList() {
+    public ArrayList<NoteEntity> getNotesList() {
         return new ArrayList<>(tempNotesList);
     }
 

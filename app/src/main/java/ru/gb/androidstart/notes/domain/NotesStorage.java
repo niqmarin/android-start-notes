@@ -1,9 +1,9 @@
 package ru.gb.androidstart.notes.domain;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public interface NotesStorage {
-    List<NoteEntity> getNotesList();
+    ArrayList<NoteEntity> getNotesList();
     boolean addNote(NoteEntity note);
     boolean deleteNote(int id);
     boolean editNote(int id, NoteEntity note);

@@ -2,8 +2,6 @@ package ru.gb.androidstart.notes.domain;
 
 import java.util.Date;
 
-import androidx.annotation.Nullable;
-
 public class NoteEntity {
 
     private int id;

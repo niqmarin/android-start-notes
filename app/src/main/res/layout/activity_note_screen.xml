@@ -22,7 +22,7 @@
     <EditText
         android:id="@+id/note_contents_text_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         tools:text="Съешь ещё этих мягких французских булок да выпей же чаю"
         style="@style/NoteScreenTextStyle.Contents"/>
 

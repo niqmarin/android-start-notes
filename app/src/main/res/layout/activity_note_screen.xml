@@ -5,6 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <ImageButton
+        android:id="@+id/save_note_button"
+        android:layout_width="@dimen/icon_button_size"
+        android:layout_height="@dimen/icon_button_size"
+        android:background="?selectableItemBackground"
+        style="@style/ButtonStyle"/>
+
     <TextView
         android:id="@+id/note_date_text_view"
         android:layout_width="match_parent"

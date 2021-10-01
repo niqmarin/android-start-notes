@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.text.DateFormatSymbols;
@@ -16,12 +17,14 @@ import ru.gb.androidstart.notes.domain.NoteEntity;
 
 public class NoteScreenActivity extends AppCompatActivity {
 
+    private ImageButton saveNoteButton;
     private TextView dateTextView;
     private EditText titleEditText;
     private EditText contentsEditText;
     static final String DATE_EXTRA_KEY = "DATE_EXTRA_KEY";
     static final String TITLE_EXTRA_KEY = "TITLE_EXTRA_KEY";
     static final String CONTENTS_EXTRA_KEY = "CONTENTS_EXTRA_KEY";
+    static boolean isNew;
 
     private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
 
@@ -45,35 +48,46 @@ public class NoteScreenActivity extends AppCompatActivity {
 
     private void fillViews() {
         if (getIntent().getExtras() == null) {
-            String currentDate = dateTimeFormat.format(new Date());
-            dateTextView.setText(currentDate);
+            dateTextView.setText(dateTimeFormat.format(new Date()));
         } else {
-            String date = getIntent().getStringExtra(DATE_EXTRA_KEY);
-            String title = getIntent().getStringExtra(TITLE_EXTRA_KEY);
-            String contents = getIntent().getStringExtra(CONTENTS_EXTRA_KEY);
-            dateTextView.setText(date);
-            titleEditText.setText(title);
-            contentsEditText.setText(contents);
+            Date date = new Date();
+            date.setTime(getIntent().getLongExtra(DATE_EXTRA_KEY, -1));
+            dateTextView.setText(dateTimeFormat.format(date));
+            titleEditText.setText(getIntent().getStringExtra(TITLE_EXTRA_KEY));
+            contentsEditText.setText(getIntent().getStringExtra(CONTENTS_EXTRA_KEY));
         }
     }
 
     private void initViews() {
+        saveNoteButton = findViewById(R.id.save_note_button);
+        saveNoteButton.setOnClickListener(v -> saveNote());
         dateTextView = findViewById(R.id.note_date_text_view);
         titleEditText = findViewById(R.id.note_title_text_view);
         contentsEditText = findViewById(R.id.note_contents_text_view);
+        contentsEditText.requestFocus();
     }
 
     static void openNewNote(Context context) {
         Intent openNewIntent = new Intent(context, NoteScreenActivity.class);
         context.startActivity(openNewIntent);
+        isNew = true;
     }
 
     static void openSelectedNote(Context context, NoteEntity note) {
         Intent openSelectedIntent = new Intent(context, NoteScreenActivity.class);
-        openSelectedIntent.putExtra(DATE_EXTRA_KEY, dateTimeFormat.format(note.getDate()));
+        openSelectedIntent.putExtra(DATE_EXTRA_KEY, note.getDate().getTime());
         openSelectedIntent.putExtra(TITLE_EXTRA_KEY, note.getTitle());
         openSelectedIntent.putExtra(CONTENTS_EXTRA_KEY, note.getContents());
         context.startActivity(openSelectedIntent);
+    }
+
+    private void saveNote() {
+        if (isNew) {
+            NoteEntity newNote = new NoteEntity(titleEditText.getText().toString(), contentsEditText.getText().toString());
+            NotesListActivity.notesStorage.addNote(newNote);
+            isNew = false;
+        }
+        NotesListActivity.notesAdapter.setData(NotesListActivity.notesStorage.getNotesList());
     }
 
 }

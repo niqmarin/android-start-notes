@@ -16,8 +16,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class NotesListActivity extends AppCompatActivity {
     private FloatingActionButton addNoteButton;
     private RecyclerView notesRecycleView;
-    private NotesStorage notesStorage = new NotesStorageImpl();
-    private NotesAdapter notesAdapter = new NotesAdapter();
+    public static NotesStorage notesStorage = new NotesStorageImpl();
+    public static NotesAdapter notesAdapter = new NotesAdapter();
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {

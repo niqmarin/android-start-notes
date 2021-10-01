@@ -7,7 +7,6 @@ import ru.gb.androidstart.notes.domain.NotesStorage;
 
 public class NotesStorageImpl implements NotesStorage {
     private ArrayList<NoteEntity> tempNotesList = new ArrayList<>();
-    private int counter = 0;
 
     @Override
     public ArrayList<NoteEntity> getNotesList() {
@@ -16,7 +15,6 @@ public class NotesStorageImpl implements NotesStorage {
 
     @Override
     public boolean addNote(NoteEntity note) {
-        note.setId(++counter);
         tempNotesList.add(note);
         return true;
     }

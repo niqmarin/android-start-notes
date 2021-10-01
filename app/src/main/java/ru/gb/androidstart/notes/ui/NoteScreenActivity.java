@@ -24,7 +24,7 @@ public class NoteScreenActivity extends AppCompatActivity {
     static final String DATE_EXTRA_KEY = "DATE_EXTRA_KEY";
     static final String TITLE_EXTRA_KEY = "TITLE_EXTRA_KEY";
     static final String CONTENTS_EXTRA_KEY = "CONTENTS_EXTRA_KEY";
-    static boolean isNew;
+    private static int currentNoteID;
 
     private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
 
@@ -70,7 +70,7 @@ public class NoteScreenActivity extends AppCompatActivity {
     static void openNewNote(Context context) {
         Intent openNewIntent = new Intent(context, NoteScreenActivity.class);
         context.startActivity(openNewIntent);
-        isNew = true;
+        currentNoteID = -1;
     }
 
     static void openSelectedNote(Context context, NoteEntity note) {
@@ -78,14 +78,18 @@ public class NoteScreenActivity extends AppCompatActivity {
         openSelectedIntent.putExtra(DATE_EXTRA_KEY, note.getDate().getTime());
         openSelectedIntent.putExtra(TITLE_EXTRA_KEY, note.getTitle());
         openSelectedIntent.putExtra(CONTENTS_EXTRA_KEY, note.getContents());
+        currentNoteID = note.getId();
         context.startActivity(openSelectedIntent);
     }
 
     private void saveNote() {
-        if (isNew) {
+        if (currentNoteID == -1) {
             NoteEntity newNote = new NoteEntity(titleEditText.getText().toString(), contentsEditText.getText().toString());
             NotesListActivity.notesStorage.addNote(newNote);
-            isNew = false;
+            currentNoteID = newNote.getId();
+        } else {
+            NoteEntity newNote = new NoteEntity(currentNoteID, titleEditText.getText().toString(), contentsEditText.getText().toString());
+            NotesListActivity.notesStorage.editNote(currentNoteID, newNote);
         }
         NotesListActivity.notesAdapter.setData(NotesListActivity.notesStorage.getNotesList());
     }

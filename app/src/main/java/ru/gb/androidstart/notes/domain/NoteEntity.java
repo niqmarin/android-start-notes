@@ -17,6 +17,13 @@ public class NoteEntity {
         this.date = new Date();
     }
 
+    public NoteEntity(int id, String title, String contents) {
+        this.id = id;
+        this.title = title;
+        this.contents = contents;
+        this.date = new Date();
+    }
+
     public Integer getId() {
         return id;
     }

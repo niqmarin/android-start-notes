@@ -33,8 +33,7 @@ public class NotesStorageImpl implements NotesStorage {
     @Override
     public boolean editNote(int id, NoteEntity note) {
         deleteNote(id);
-        note.setId(id);
         tempNotesList.add(note);
-        return false;
+        return true;
     }
 }

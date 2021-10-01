@@ -1,5 +1,6 @@
 package ru.gb.androidstart.notes.ui;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class NotesListActivity extends AppCompatActivity {
+    private static final String NOTES_LIST_KEY = "NOTES_LIST_KEY";
     private FloatingActionButton addNoteButton;
     private RecyclerView notesRecycleView;
     public static NotesStorage notesStorage = new NotesStorageImpl();
@@ -59,13 +61,6 @@ public class NotesListActivity extends AppCompatActivity {
         notesStorage.addNote(new NoteEntity("заголовок 1", "съешь ещё этих мягких французских булок, да выпей же чаю"));
         notesStorage.addNote(new NoteEntity("заголовок 2", "съешь ещё этих мягких французских булок, да выпей же чаю"));
         notesStorage.addNote(new NoteEntity("заголовок 3", "съешь ещё этих мягких французских булок, да выпей же чаю"));
-        notesStorage.addNote(new NoteEntity("заголовок 4", "съешь ещё этих мягких французских булок, да выпей же чаю"));
-        notesStorage.addNote(new NoteEntity("заголовок 5", "съешь ещё этих мягких французских булок, да выпей же чаю"));
-        notesStorage.addNote(new NoteEntity("заголовок 6", "съешь ещё этих мягких французских булок, да выпей же чаю"));
-        notesStorage.addNote(new NoteEntity("заголовок 7", "съешь ещё этих мягких французских булок, да выпей же чаю"));
-        notesStorage.addNote(new NoteEntity("заголовок 8", "съешь ещё этих мягких французских булок, да выпей же чаю"));
-        notesStorage.addNote(new NoteEntity("заголовок 9", "съешь ещё этих мягких французских булок, да выпей же чаю"));
-        notesStorage.addNote(new NoteEntity("заголовок 10", "съешь ещё этих мягких французских булок, да выпей же чаю"));
     }
 
 }

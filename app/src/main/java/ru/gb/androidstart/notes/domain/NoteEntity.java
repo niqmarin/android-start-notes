@@ -10,18 +10,18 @@ public class NoteEntity {
     private Date date;
     private static int counter = 0;
 
-    public NoteEntity(String title, String contents) {
+    public NoteEntity(String title, String contents, Date date) {
         this.id = ++counter;
         this.title = title;
         this.contents = contents;
-        this.date = new Date();
+        this.date = date;
     }
 
-    public NoteEntity(int id, String title, String contents) {
+    public NoteEntity(int id, String title, String contents, Date date) {
         this.id = id;
         this.title = title;
         this.contents = contents;
-        this.date = new Date();
+        this.date = date;
     }
 
     public Integer getId() {

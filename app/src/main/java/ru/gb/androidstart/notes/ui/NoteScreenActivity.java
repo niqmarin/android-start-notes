@@ -1,6 +1,6 @@
 package ru.gb.androidstart.notes.ui;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -13,7 +13,6 @@ import java.util.Date;
 
 import androidx.appcompat.app.AppCompatActivity;
 import ru.gb.androidstart.notes.R;
-import ru.gb.androidstart.notes.domain.NoteEntity;
 
 public class NoteScreenActivity extends AppCompatActivity {
 
@@ -24,7 +23,7 @@ public class NoteScreenActivity extends AppCompatActivity {
     static final String DATE_EXTRA_KEY = "DATE_EXTRA_KEY";
     static final String TITLE_EXTRA_KEY = "TITLE_EXTRA_KEY";
     static final String CONTENTS_EXTRA_KEY = "CONTENTS_EXTRA_KEY";
-    private static int currentNoteID;
+    Date currentDate;
 
     private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
 
@@ -47,12 +46,12 @@ public class NoteScreenActivity extends AppCompatActivity {
     }
 
     private void fillViews() {
+        currentDate = new Date();
         if (getIntent().getExtras() == null) {
-            dateTextView.setText(dateTimeFormat.format(new Date()));
+            dateTextView.setText(dateTimeFormat.format(currentDate));
         } else {
-            Date date = new Date();
-            date.setTime(getIntent().getLongExtra(DATE_EXTRA_KEY, -1));
-            dateTextView.setText(dateTimeFormat.format(date));
+            currentDate.setTime(getIntent().getLongExtra(DATE_EXTRA_KEY, -1));
+            dateTextView.setText(dateTimeFormat.format(currentDate));
             titleEditText.setText(getIntent().getStringExtra(TITLE_EXTRA_KEY));
             contentsEditText.setText(getIntent().getStringExtra(CONTENTS_EXTRA_KEY));
         }
@@ -67,31 +66,13 @@ public class NoteScreenActivity extends AppCompatActivity {
         contentsEditText.requestFocus();
     }
 
-    static void openNewNote(Context context) {
-        Intent openNewIntent = new Intent(context, NoteScreenActivity.class);
-        context.startActivity(openNewIntent);
-        currentNoteID = -1;
-    }
-
-    static void openSelectedNote(Context context, NoteEntity note) {
-        Intent openSelectedIntent = new Intent(context, NoteScreenActivity.class);
-        openSelectedIntent.putExtra(DATE_EXTRA_KEY, note.getDate().getTime());
-        openSelectedIntent.putExtra(TITLE_EXTRA_KEY, note.getTitle());
-        openSelectedIntent.putExtra(CONTENTS_EXTRA_KEY, note.getContents());
-        currentNoteID = note.getId();
-        context.startActivity(openSelectedIntent);
-    }
-
     private void saveNote() {
-        if (currentNoteID == -1) {
-            NoteEntity newNote = new NoteEntity(titleEditText.getText().toString(), contentsEditText.getText().toString());
-            NotesListActivity.notesStorage.addNote(newNote);
-            currentNoteID = newNote.getId();
-        } else {
-            NoteEntity newNote = new NoteEntity(currentNoteID, titleEditText.getText().toString(), contentsEditText.getText().toString());
-            NotesListActivity.notesStorage.editNote(currentNoteID, newNote);
-        }
-        NotesListActivity.notesAdapter.setData(NotesListActivity.notesStorage.getNotesList());
+        currentDate = new Date();
+        Intent noteChangeIntent = new Intent();
+        noteChangeIntent.putExtra(DATE_EXTRA_KEY, currentDate.getTime());
+        noteChangeIntent.putExtra(TITLE_EXTRA_KEY, titleEditText.getText().toString());
+        noteChangeIntent.putExtra(CONTENTS_EXTRA_KEY, contentsEditText.getText().toString());
+        setResult(Activity.RESULT_OK, noteChangeIntent);
     }
 
 }

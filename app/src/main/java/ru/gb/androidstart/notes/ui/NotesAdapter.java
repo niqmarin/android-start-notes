@@ -19,17 +19,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteViewHolder> {
 
     private OnItemClickListener clickListener = null;
 
-    private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
-
-        @Override
-        public String[] getMonths() {
-            return new String[]{"января", "февраля", "марта", "апреля", "мая", "июня",
-                    "июля", "августа", "сентября", "октября", "ноября", "декабря"};
-        }
-    };
-
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM yyyy", myDateFormatSymbols);
-
     private ArrayList<NoteEntity> data = new ArrayList<>();
 
     public void setData (ArrayList<NoteEntity> data) {
@@ -41,17 +30,12 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteViewHolder> {
     @NonNull
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_item_note_layout, parent, false);
-        return new NoteViewHolder(view);
+        return new NoteViewHolder(parent, clickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
-        NoteEntity note = getItem(position);
-        holder.itemView.setOnClickListener(v -> clickListener.onItemClick(note));
-        holder.titleTextView.setText(note.getTitle());
-        holder.contentsTextView.setText(note.getContents());
-        holder.dateTextView.setText(dateFormat.format(note.getDate()));
+        holder.bind(getItem(position));
     }
 
     private NoteEntity getItem(int position) {

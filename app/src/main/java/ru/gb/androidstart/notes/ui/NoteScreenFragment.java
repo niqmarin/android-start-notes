@@ -1,7 +1,6 @@
 package ru.gb.androidstart.notes.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +27,10 @@ public class NoteScreenFragment extends Fragment {
     static final String DATE_KEY = "DATE_KEY";
     static final String TITLE_KEY = "TITLE_KEY";
     static final String CONTENTS_KEY = "CONTENTS_KEY";
-    static final String NOTE_DATA_KEY = "NOTE_DATA_KEY";
+    static final String NOTE_DATA_IN_KEY = "NOTE_DATA_IN_KEY";
+    static final String NOTE_DATA_OUT_KEY = "NOTE_DATA_OUT_KEY";
     Date currentDate = new Date();
+    FragmentManager fragmentManager;
 
     private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
 
@@ -45,7 +46,7 @@ public class NoteScreenFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        fragmentManager = getActivity().getSupportFragmentManager();
         setRetainInstance(true);
     }
 
@@ -58,11 +59,12 @@ public class NoteScreenFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        saveNoteButton = view.findViewById(R.id.save_note_button);
+        saveNoteButton.setOnClickListener(v -> saveNote());
         dateTextView = view.findViewById(R.id.note_date_text_view);
         titleEditText = view.findViewById(R.id.note_title_text_view);
         contentsEditText = view.findViewById(R.id.note_contents_text_view);
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        fragmentManager.setFragmentResultListener(NOTE_DATA_KEY, this, new FragmentResultListener() {
+        fragmentManager.setFragmentResultListener(NOTE_DATA_IN_KEY, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
                 currentDate.setTime(result.getLong(DATE_KEY, -1));
@@ -71,5 +73,14 @@ public class NoteScreenFragment extends Fragment {
                 contentsEditText.setText(result.getString(CONTENTS_KEY));
             }
         });
+    }
+
+    private void saveNote() {
+        currentDate = new Date();
+        Bundle result = new Bundle();
+        result.putLong(DATE_KEY, currentDate.getTime());
+        result.putString(TITLE_KEY, titleEditText.getText().toString());
+        result.putString(CONTENTS_KEY, contentsEditText.getText().toString());
+        fragmentManager.setFragmentResult(NoteScreenFragment.NOTE_DATA_OUT_KEY, result);
     }
 }

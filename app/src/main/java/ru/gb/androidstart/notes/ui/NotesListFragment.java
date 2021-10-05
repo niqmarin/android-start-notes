@@ -1,7 +1,6 @@
 package ru.gb.androidstart.notes.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,13 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.Date;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ru.gb.androidstart.notes.R;
@@ -29,12 +28,17 @@ public class NotesListFragment extends Fragment {
     private RecyclerView notesRecycleView;
     private NotesStorage notesStorage = new NotesStorageImpl();
     private NotesAdapter notesAdapter = new NotesAdapter();
+    FragmentManager fragmentManager;
+    private Date newNoteDate;
+    private String newNoteTitle;
+    private String newNoteContents;
 
     private int currentNoteID;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fragmentManager = getActivity().getSupportFragmentManager();
         addTestNotes();
         setRetainInstance(true);
     }
@@ -56,12 +60,22 @@ public class NotesListFragment extends Fragment {
         notesRecycleView.setAdapter(notesAdapter);
         notesAdapter.setData(notesStorage.getNotesList());
         notesAdapter.setOnItemClickListener(item -> onItemClick(item));
+
+        fragmentManager.setFragmentResultListener(NoteScreenFragment.NOTE_DATA_OUT_KEY, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                newNoteDate = new Date(result.getLong(NoteScreenFragment.DATE_KEY, -1));
+                newNoteTitle = result.getString(NoteScreenFragment.TITLE_KEY);
+                newNoteContents = result.getString(NoteScreenFragment.CONTENTS_KEY);
+                saveNoteChange();
+            }
+        });
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
         inflater.inflate(R.menu.notes_list_menu, menu);
-
     }
 
     @Override
@@ -92,13 +106,23 @@ public class NotesListFragment extends Fragment {
             result.putString(NoteScreenFragment.TITLE_KEY, "");
             result.putString(NoteScreenFragment.CONTENTS_KEY, "");
         }
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        fragmentManager.setFragmentResult(NoteScreenFragment.NOTE_DATA_KEY, result);
+        fragmentManager.setFragmentResult(NoteScreenFragment.NOTE_DATA_IN_KEY, result);
         fragmentManager
                 .beginTransaction()
                 .add(R.id.portrait_orientation_fragment_container, new NoteScreenFragment())
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private void saveNoteChange() {
+        if (currentNoteID == -1) {
+            NoteEntity newNote = new NoteEntity(newNoteTitle, newNoteContents, newNoteDate);
+            notesStorage.addNote(newNote);
+        } else {
+            NoteEntity newNote = new NoteEntity(currentNoteID, newNoteTitle, newNoteContents, newNoteDate);
+            notesStorage.editNote(currentNoteID, newNote);
+        }
+        notesAdapter.setData(notesStorage.getNotesList());
     }
 
     private void addTestNotes() {

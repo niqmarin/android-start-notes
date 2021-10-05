@@ -29,8 +29,8 @@ public class NoteScreenFragment extends Fragment {
     static final String CONTENTS_KEY = "CONTENTS_KEY";
     static final String NOTE_DATA_IN_KEY = "NOTE_DATA_IN_KEY";
     static final String NOTE_DATA_OUT_KEY = "NOTE_DATA_OUT_KEY";
-    Date currentDate = new Date();
-    FragmentManager fragmentManager;
+    private Date currentDate = new Date();
+    private FragmentManager fragmentManager;
 
     private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
 
@@ -59,11 +59,19 @@ public class NoteScreenFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initViews(view);
+        fillNoteData();
+    }
+
+    private void initViews(View view) {
         saveNoteButton = view.findViewById(R.id.save_note_button);
         saveNoteButton.setOnClickListener(v -> saveNote());
         dateTextView = view.findViewById(R.id.note_date_text_view);
         titleEditText = view.findViewById(R.id.note_title_text_view);
         contentsEditText = view.findViewById(R.id.note_contents_text_view);
+    }
+
+    private void fillNoteData() {
         fragmentManager.setFragmentResultListener(NOTE_DATA_IN_KEY, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {

@@ -28,7 +28,7 @@ public class NotesListFragment extends Fragment {
     private RecyclerView notesRecycleView;
     private NotesStorage notesStorage = new NotesStorageImpl();
     private NotesAdapter notesAdapter = new NotesAdapter();
-    FragmentManager fragmentManager;
+    private FragmentManager fragmentManager;
     private Date newNoteDate;
     private String newNoteTitle;
     private String newNoteContents;
@@ -54,13 +54,20 @@ public class NotesListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setHasOptionsMenu(true);
+        initViews(view);
+        getNoteData();
+    }
+
+    private void initViews(View view) {
         ((AppCompatActivity)getActivity()).setSupportActionBar(view.findViewById(R.id.notes_list_toolbar));
         notesRecycleView = view.findViewById(R.id.notes_list_recycle_view);
         notesRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
         notesRecycleView.setAdapter(notesAdapter);
         notesAdapter.setData(notesStorage.getNotesList());
         notesAdapter.setOnItemClickListener(item -> onItemClick(item));
+    }
 
+    private void getNoteData() {
         fragmentManager.setFragmentResultListener(NoteScreenFragment.NOTE_DATA_OUT_KEY, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
@@ -95,7 +102,15 @@ public class NotesListFragment extends Fragment {
     }
 
     private void openNoteScreen(@Nullable NoteEntity note) {
-        @Nullable
+        passNoteData(note);
+        fragmentManager
+                .beginTransaction()
+                .add(R.id.portrait_orientation_fragment_container, new NoteScreenFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void passNoteData(NoteEntity note) {
         Bundle result = new Bundle();
         if (note != null) {
             result.putLong(NoteScreenFragment.DATE_KEY, note.getDate().getTime());
@@ -107,11 +122,6 @@ public class NotesListFragment extends Fragment {
             result.putString(NoteScreenFragment.CONTENTS_KEY, "");
         }
         fragmentManager.setFragmentResult(NoteScreenFragment.NOTE_DATA_IN_KEY, result);
-        fragmentManager
-                .beginTransaction()
-                .add(R.id.portrait_orientation_fragment_container, new NoteScreenFragment())
-                .addToBackStack(null)
-                .commit();
     }
 
     private void saveNoteChange() {
@@ -126,8 +136,10 @@ public class NotesListFragment extends Fragment {
     }
 
     private void addTestNotes() {
-        notesStorage.addNote(new NoteEntity("заголовок 1", "съешь ещё этих мягких французских булок, да выпей же чаю", new Date()));
-        notesStorage.addNote(new NoteEntity("заголовок 2", "съешь ещё этих мягких французских булок, да выпей же чаю", new Date()));
-        notesStorage.addNote(new NoteEntity("заголовок 3", "съешь ещё этих мягких французских булок, да выпей же чаю", new Date()));
+        if (notesStorage.getNotesList().size() == 0) {
+            notesStorage.addNote(new NoteEntity("заголовок 1", "съешь ещё этих мягких французских булок, да выпей же чаю", new Date()));
+            notesStorage.addNote(new NoteEntity("заголовок 2", "съешь ещё этих мягких французских булок, да выпей же чаю", new Date()));
+            notesStorage.addNote(new NoteEntity("заголовок 3", "съешь ещё этих мягких французских булок, да выпей же чаю", new Date()));
+        }
     }
 }

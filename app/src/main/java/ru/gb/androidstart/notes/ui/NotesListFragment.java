@@ -1,6 +1,9 @@
 package ru.gb.androidstart.notes.ui;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,12 +38,15 @@ public class NotesListFragment extends Fragment {
 
     private int currentNoteID;
 
+    private static final String NOTES_LIST_KEY = "NOTES_LIST_KEY";
+    private static final String NOTE_STORAGE_KEY = "NOTE_STORAGE_KEY";
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager = requireActivity().getSupportFragmentManager();
         addTestNotes();
-        setRetainInstance(true);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -53,7 +59,7 @@ public class NotesListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setHasOptionsMenu(true);
+        restoreNotesList();
         initViews(view);
         getNoteData();
     }
@@ -77,6 +83,23 @@ public class NotesListFragment extends Fragment {
                 saveNoteChange();
             }
         });
+    }
+
+    private void restoreNotesList() {
+        fragmentManager.setFragmentResultListener(NOTE_STORAGE_KEY, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                notesStorage.setNotesList(result.getParcelableArrayList(NOTES_LIST_KEY));
+            }
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Bundle result = new Bundle();
+        result.putParcelableArrayList(NOTES_LIST_KEY, notesStorage.getNotesList());
+        fragmentManager.setFragmentResult(NOTE_STORAGE_KEY, result);
     }
 
     @Override
@@ -103,11 +126,13 @@ public class NotesListFragment extends Fragment {
 
     private void openNoteScreen(@Nullable NoteEntity note) {
         passNoteData(note);
-        fragmentManager
-                .beginTransaction()
-                .add(R.id.portrait_orientation_fragment_container, new NoteScreenFragment())
-                .addToBackStack(null)
-                .commit();
+        if (!isLandOrientation()) {
+            fragmentManager
+                    .beginTransaction()
+                    .add(R.id.portrait_orientation_fragment_container, new NoteScreenFragment())
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 
     private void passNoteData(NoteEntity note) {
@@ -141,5 +166,9 @@ public class NotesListFragment extends Fragment {
             notesStorage.addNote(new NoteEntity("заголовок 2", "съешь ещё этих мягких французских булок, да выпей же чаю", new Date()));
             notesStorage.addNote(new NoteEntity("заголовок 3", "съешь ещё этих мягких французских булок, да выпей же чаю", new Date()));
         }
+    }
+
+    private boolean isLandOrientation(){
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 }

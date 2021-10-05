@@ -46,8 +46,6 @@ public class NoteScreenFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentManager = getActivity().getSupportFragmentManager();
-        setRetainInstance(true);
     }
 
     @Nullable
@@ -59,6 +57,7 @@ public class NoteScreenFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        fragmentManager = getActivity().getSupportFragmentManager();
         initViews(view);
         fillNoteData();
     }

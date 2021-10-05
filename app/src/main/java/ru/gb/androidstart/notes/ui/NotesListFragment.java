@@ -1,7 +1,7 @@
 package ru.gb.androidstart.notes.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,11 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.Date;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ru.gb.androidstart.notes.R;
@@ -79,7 +81,24 @@ public class NotesListFragment extends Fragment {
     }
 
     private void openNoteScreen(@Nullable NoteEntity note) {
-        //todo
+        @Nullable
+        Bundle result = new Bundle();
+        if (note != null) {
+            result.putLong(NoteScreenFragment.DATE_KEY, note.getDate().getTime());
+            result.putString(NoteScreenFragment.TITLE_KEY, note.getTitle());
+            result.putString(NoteScreenFragment.CONTENTS_KEY, note.getContents());
+        } else {
+            result.putLong(NoteScreenFragment.DATE_KEY, new Date().getTime());
+            result.putString(NoteScreenFragment.TITLE_KEY, "");
+            result.putString(NoteScreenFragment.CONTENTS_KEY, "");
+        }
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        fragmentManager.setFragmentResult(NoteScreenFragment.NOTE_DATA_KEY, result);
+        fragmentManager
+                .beginTransaction()
+                .add(R.id.portrait_orientation_fragment_container, new NoteScreenFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
     private void addTestNotes() {

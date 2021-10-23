@@ -1,5 +1,8 @@
 package ru.gb.androidstart.notes.impl;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
 import ru.gb.androidstart.notes.domain.NoteEntity;
@@ -11,6 +14,11 @@ public class NotesStorageImpl implements NotesStorage {
     @Override
     public ArrayList<NoteEntity> getNotesList() {
         return new ArrayList<>(tempNotesList);
+    }
+
+    @Override
+    public void setNotesList(ArrayList<NoteEntity> notesList) {
+        this.tempNotesList = notesList;
     }
 
     @Override
@@ -37,3 +45,4 @@ public class NotesStorageImpl implements NotesStorage {
         return true;
     }
 }
+

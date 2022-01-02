@@ -1,9 +1,7 @@
 package ru.gb.androidstart.notes.ui;
 
-import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,7 +26,7 @@ import ru.gb.androidstart.notes.impl.NotesStorageImpl;
 
 public class NotesListFragment extends Fragment {
 
-    private RecyclerView notesRecycleView;
+    private RecyclerView notesRecyclerView;
     private NotesStorage notesStorage = new NotesStorageImpl();
     private NotesAdapter notesAdapter = new NotesAdapter();
     private FragmentManager fragmentManager;
@@ -36,7 +34,7 @@ public class NotesListFragment extends Fragment {
     private String newNoteTitle;
     private String newNoteContents;
 
-    private int currentNoteID;
+    private String currentNoteID;
 
     private static final String NOTES_LIST_KEY = "NOTES_LIST_KEY";
     private static final String NOTE_STORAGE_KEY = "NOTE_STORAGE_KEY";
@@ -66,9 +64,9 @@ public class NotesListFragment extends Fragment {
 
     private void initViews(View view) {
         ((AppCompatActivity)getActivity()).setSupportActionBar(view.findViewById(R.id.notes_list_toolbar));
-        notesRecycleView = view.findViewById(R.id.notes_list_recycle_view);
-        notesRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        notesRecycleView.setAdapter(notesAdapter);
+        notesRecyclerView = view.findViewById(R.id.notes_list_recycle_view);
+        notesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        notesRecyclerView.setAdapter(notesAdapter);
         notesAdapter.setData(notesStorage.getNotesList());
         notesAdapter.setOnItemClickListener(item -> onItemClick(item));
     }
@@ -111,7 +109,7 @@ public class NotesListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_note_menu) {
-            currentNoteID = -1;
+            currentNoteID = null;
             openNoteScreen(null);
             return true;
         } else {
@@ -135,7 +133,7 @@ public class NotesListFragment extends Fragment {
         }
     }
 
-    private void passNoteData(NoteEntity note) {
+    private void passNoteData(@Nullable NoteEntity note) {
         Bundle result = new Bundle();
         if (note != null) {
             result.putLong(NoteScreenFragment.DATE_KEY, note.getDate().getTime());
@@ -150,7 +148,7 @@ public class NotesListFragment extends Fragment {
     }
 
     private void saveNoteChange() {
-        if (currentNoteID == -1) {
+        if (currentNoteID == null) {
             NoteEntity newNote = new NoteEntity(newNoteTitle, newNoteContents, newNoteDate);
             notesStorage.addNote(newNote);
         } else {

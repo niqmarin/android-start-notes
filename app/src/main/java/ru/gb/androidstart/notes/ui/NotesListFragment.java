@@ -1,5 +1,6 @@
 package ru.gb.androidstart.notes.ui;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -38,6 +39,14 @@ public class NotesListFragment extends Fragment {
 
     private static final String NOTES_LIST_KEY = "NOTES_LIST_KEY";
     private static final String NOTE_STORAGE_KEY = "NOTE_STORAGE_KEY";
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (!(context instanceof Controller)) {
+            throw new IllegalStateException("Activity must implement Controller");
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -124,13 +133,8 @@ public class NotesListFragment extends Fragment {
 
     private void openNoteScreen(@Nullable NoteEntity note) {
         passNoteData(note);
-        if (!isLandOrientation()) {
-            fragmentManager
-                    .beginTransaction()
-                    .add(R.id.portrait_orientation_fragment_container, new NoteScreenFragment())
-                    .addToBackStack(null)
-                    .commit();
-        }
+        getController().openNote();
+
     }
 
     private void passNoteData(@Nullable NoteEntity note) {
@@ -168,5 +172,13 @@ public class NotesListFragment extends Fragment {
 
     private boolean isLandOrientation(){
         return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    }
+
+    private Controller getController() {
+        return (Controller) requireActivity();
+    }
+
+    interface Controller {
+        void openNote();
     }
 }

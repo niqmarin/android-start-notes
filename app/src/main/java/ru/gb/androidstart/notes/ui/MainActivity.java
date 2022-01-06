@@ -3,12 +3,15 @@ package ru.gb.androidstart.notes.ui;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import ru.gb.androidstart.notes.R;
 import ru.gb.androidstart.notes.domain.NoteEntity;
 
-public class MainActivity extends AppCompatActivity implements NotesListFragment.OnFragmentSendDataListener {
+public class MainActivity extends AppCompatActivity implements NotesListFragment.OnFragmentSendDataListener, NoteScreenFragment.OnFragmentSaveDataListener {
+
+    private NotesListFragment notesListFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
     }
 
     private void openNotesList() {
+        notesListFragment = new NotesListFragment();
         int notesListContainer;
         if (isLandOrientation())
             notesListContainer = R.id.notes_list_fragment_container;
@@ -30,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
             notesListContainer = R.id.portrait_orientation_fragment_container;
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(notesListContainer, new NotesListFragment())
+                .add(notesListContainer, notesListFragment)
                 .commit();
     }
 
@@ -51,5 +55,10 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
                 .addToBackStack(null)
                 .commit();
         noteScreenFragment.getNoteData(note);
+    }
+
+    @Override
+    public void saveNote(@NonNull NoteEntity note) {
+        notesListFragment.saveNoteChange(note);
     }
 }

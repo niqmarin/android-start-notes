@@ -1,5 +1,6 @@
 package ru.gb.androidstart.notes.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,14 +25,10 @@ public class NoteScreenFragment extends Fragment {
     private TextView dateTextView;
     private EditText titleEditText;
     private EditText contentsEditText;
-    static final String DATE_KEY = "DATE_KEY";
-    static final String TITLE_KEY = "TITLE_KEY";
-    static final String CONTENTS_KEY = "CONTENTS_KEY";
-    static final String NOTE_DATA_OUT_KEY = "NOTE_DATA_OUT_KEY";
-    private Date currentDate;
-    private FragmentManager fragmentManager;
 
     private NoteEntity currentNote = null;
+
+    private OnFragmentSaveDataListener fragmentSaveDataListener;
 
     private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
 
@@ -43,6 +40,17 @@ public class NoteScreenFragment extends Fragment {
     };
 
     private static final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("d MMMM yyyy, H:mm", myDateFormatSymbols);
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            fragmentSaveDataListener = (OnFragmentSaveDataListener) context;
+        }
+        catch (ClassCastException e) {
+            throw new ClassCastException("Activity must implement OnFragmentSaveDataListener");
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,14 +66,14 @@ public class NoteScreenFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        fragmentManager = getActivity().getSupportFragmentManager();
+
         initViews(view);
         fillNoteData();
     }
 
     private void initViews(View view) {
         saveNoteButton = view.findViewById(R.id.save_note_button);
-        saveNoteButton.setOnClickListener(v -> saveNote());
+        saveNoteButton.setOnClickListener(v -> saveNoteData());
         dateTextView = view.findViewById(R.id.note_date_text_view);
         titleEditText = view.findViewById(R.id.note_title_text_view);
         contentsEditText = view.findViewById(R.id.note_contents_text_view);
@@ -87,12 +95,21 @@ public class NoteScreenFragment extends Fragment {
         currentNote = note;
     }
 
-    private void saveNote() {
-        currentDate = new Date();
-        Bundle result = new Bundle();
-        result.putLong(DATE_KEY, currentDate.getTime());
-        result.putString(TITLE_KEY, titleEditText.getText().toString());
-        result.putString(CONTENTS_KEY, contentsEditText.getText().toString());
-        fragmentManager.setFragmentResult(NoteScreenFragment.NOTE_DATA_OUT_KEY, result);
+    private void saveNoteData() {
+        if (currentNote == null) {
+            currentNote = new NoteEntity(titleEditText.getText().toString(),
+                    contentsEditText.getText().toString(),
+                    new Date()
+            );
+        } else {
+            currentNote.setDate(new Date());
+            currentNote.setTitle(titleEditText.getText().toString());
+            currentNote.setContents(contentsEditText.getText().toString());
+        }
+        fragmentSaveDataListener.saveNote(currentNote);
+    }
+
+    interface OnFragmentSaveDataListener {
+        void saveNote(NoteEntity note);
     }
 }

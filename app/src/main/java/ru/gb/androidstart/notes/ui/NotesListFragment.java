@@ -33,12 +33,6 @@ public class NotesListFragment extends Fragment {
 
     private OnFragmentSendDataListener fragmentSendDataListener;
 
-    private Date newNoteDate;
-    private String newNoteTitle;
-    private String newNoteContents;
-
-    private String currentNoteID;
-
     private static final String NOTES_LIST_KEY = "NOTES_LIST_KEY";
     private static final String NOTE_STORAGE_KEY = "NOTE_STORAGE_KEY";
 
@@ -71,9 +65,9 @@ public class NotesListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         restoreNotesList();
         initViews(view);
-        getNoteData();
     }
 
     private void initViews(View view) {
@@ -83,18 +77,6 @@ public class NotesListFragment extends Fragment {
         notesRecyclerView.setAdapter(notesAdapter);
         notesAdapter.setData(notesStorage.getNotesList());
         notesAdapter.setOnItemClickListener(note -> onItemClick(note));
-    }
-
-    private void getNoteData() {
-        fragmentManager.setFragmentResultListener(NoteScreenFragment.NOTE_DATA_OUT_KEY, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                newNoteDate = new Date(result.getLong(NoteScreenFragment.DATE_KEY, -1));
-                newNoteTitle = result.getString(NoteScreenFragment.TITLE_KEY);
-                newNoteContents = result.getString(NoteScreenFragment.CONTENTS_KEY);
-                saveNoteChange();
-            }
-        });
     }
 
     private void restoreNotesList() {
@@ -123,7 +105,6 @@ public class NotesListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_note_menu) {
-            currentNoteID = null;
             fragmentSendDataListener.openNote(null);
             return true;
         } else {
@@ -132,17 +113,14 @@ public class NotesListFragment extends Fragment {
     }
 
     private void onItemClick(@NonNull NoteEntity note) {
-        currentNoteID = note.getId();
         fragmentSendDataListener.openNote(note);
     }
 
-    private void saveNoteChange() {
-        if (currentNoteID == null) {
-            NoteEntity newNote = new NoteEntity(newNoteTitle, newNoteContents, newNoteDate);
-            notesStorage.addNote(newNote);
+    public void saveNoteChange(NoteEntity note) {
+        if (note.getId() == null) {
+            notesStorage.addNote(note);
         } else {
-            NoteEntity newNote = new NoteEntity(currentNoteID, newNoteTitle, newNoteContents, newNoteDate);
-            notesStorage.editNote(currentNoteID, newNote);
+            notesStorage.editNote(note.getId(), note);
         }
         notesAdapter.setData(notesStorage.getNotesList());
     }
@@ -153,10 +131,6 @@ public class NotesListFragment extends Fragment {
             notesStorage.addNote(new NoteEntity("заголовок 2", "съешь ещё этих мягких французских булок, да выпей же чаю", new Date()));
             notesStorage.addNote(new NoteEntity("заголовок 3", "съешь ещё этих мягких французских булок, да выпей же чаю", new Date()));
         }
-    }
-
-    private OnFragmentSendDataListener getFragmentSendDataListener() {
-        return (OnFragmentSendDataListener) requireActivity();
     }
 
     interface OnFragmentSendDataListener {

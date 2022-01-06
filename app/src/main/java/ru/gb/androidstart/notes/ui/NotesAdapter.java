@@ -1,18 +1,13 @@
 package ru.gb.androidstart.notes.ui;
 
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import ru.gb.androidstart.notes.R;
 import ru.gb.androidstart.notes.domain.NoteEntity;
 
 public class NotesAdapter extends RecyclerView.Adapter<NoteViewHolder> {

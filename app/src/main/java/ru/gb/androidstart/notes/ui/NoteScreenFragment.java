@@ -16,8 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultListener;
 import ru.gb.androidstart.notes.R;
+import ru.gb.androidstart.notes.domain.NoteEntity;
 
 public class NoteScreenFragment extends Fragment {
     private ImageButton saveNoteButton;
@@ -27,10 +27,11 @@ public class NoteScreenFragment extends Fragment {
     static final String DATE_KEY = "DATE_KEY";
     static final String TITLE_KEY = "TITLE_KEY";
     static final String CONTENTS_KEY = "CONTENTS_KEY";
-    static final String NOTE_DATA_IN_KEY = "NOTE_DATA_IN_KEY";
     static final String NOTE_DATA_OUT_KEY = "NOTE_DATA_OUT_KEY";
-    private Date currentDate = new Date();
+    private Date currentDate;
     private FragmentManager fragmentManager;
+
+    private NoteEntity currentNote = null;
 
     private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
 
@@ -71,15 +72,19 @@ public class NoteScreenFragment extends Fragment {
     }
 
     private void fillNoteData() {
-        fragmentManager.setFragmentResultListener(NOTE_DATA_IN_KEY, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                currentDate.setTime(result.getLong(DATE_KEY, -1));
-                dateTextView.setText(dateTimeFormat.format(currentDate));
-                titleEditText.setText(result.getString(TITLE_KEY));
-                contentsEditText.setText(result.getString(CONTENTS_KEY));
-            }
-        });
+        if (currentNote == null) {
+            dateTextView.setText(dateTimeFormat.format(new Date()));
+            titleEditText.setText("");
+            contentsEditText.setText("");
+        } else {
+            dateTextView.setText(dateTimeFormat.format(currentNote.getDate()));
+            titleEditText.setText(currentNote.getTitle());
+            contentsEditText.setText(currentNote.getContents());
+        }
+    }
+
+    public void getNoteData(@Nullable NoteEntity note) {
+        currentNote = note;
     }
 
     private void saveNote() {

@@ -1,7 +1,6 @@
 package ru.gb.androidstart.notes.ui;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +30,9 @@ public class NotesListFragment extends Fragment {
     private NotesStorage notesStorage = new NotesStorageImpl();
     private NotesAdapter notesAdapter = new NotesAdapter();
     private FragmentManager fragmentManager;
+
+    private OnFragmentSendDataListener fragmentSendDataListener;
+
     private Date newNoteDate;
     private String newNoteTitle;
     private String newNoteContents;
@@ -43,8 +45,11 @@ public class NotesListFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (!(context instanceof Controller)) {
-            throw new IllegalStateException("Activity must implement Controller");
+        try {
+            fragmentSendDataListener = (OnFragmentSendDataListener) context;
+        }
+        catch (ClassCastException e) {
+         throw new ClassCastException("Activity must implement OnFragmentSendDataListener");
         }
     }
 
@@ -77,7 +82,7 @@ public class NotesListFragment extends Fragment {
         notesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         notesRecyclerView.setAdapter(notesAdapter);
         notesAdapter.setData(notesStorage.getNotesList());
-        notesAdapter.setOnItemClickListener(item -> onItemClick(item));
+        notesAdapter.setOnItemClickListener(note -> onItemClick(note));
     }
 
     private void getNoteData() {
@@ -119,36 +124,16 @@ public class NotesListFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.add_note_menu) {
             currentNoteID = null;
-            openNoteScreen(null);
+            fragmentSendDataListener.openNote(null);
             return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
     }
 
-    private void onItemClick(NoteEntity item) {
-        currentNoteID = item.getId();
-        openNoteScreen(item);
-    }
-
-    private void openNoteScreen(@Nullable NoteEntity note) {
-        passNoteData(note);
-        getController().openNote();
-
-    }
-
-    private void passNoteData(@Nullable NoteEntity note) {
-        Bundle result = new Bundle();
-        if (note != null) {
-            result.putLong(NoteScreenFragment.DATE_KEY, note.getDate().getTime());
-            result.putString(NoteScreenFragment.TITLE_KEY, note.getTitle());
-            result.putString(NoteScreenFragment.CONTENTS_KEY, note.getContents());
-        } else {
-            result.putLong(NoteScreenFragment.DATE_KEY, new Date().getTime());
-            result.putString(NoteScreenFragment.TITLE_KEY, "");
-            result.putString(NoteScreenFragment.CONTENTS_KEY, "");
-        }
-        fragmentManager.setFragmentResult(NoteScreenFragment.NOTE_DATA_IN_KEY, result);
+    private void onItemClick(@NonNull NoteEntity note) {
+        currentNoteID = note.getId();
+        fragmentSendDataListener.openNote(note);
     }
 
     private void saveNoteChange() {
@@ -170,15 +155,11 @@ public class NotesListFragment extends Fragment {
         }
     }
 
-    private boolean isLandOrientation(){
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    private OnFragmentSendDataListener getFragmentSendDataListener() {
+        return (OnFragmentSendDataListener) requireActivity();
     }
 
-    private Controller getController() {
-        return (Controller) requireActivity();
-    }
-
-    interface Controller {
-        void openNote();
+    interface OnFragmentSendDataListener {
+        void openNote(@Nullable NoteEntity note);
     }
 }

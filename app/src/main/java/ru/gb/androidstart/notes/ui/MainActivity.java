@@ -6,12 +6,9 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import ru.gb.androidstart.notes.R;
+import ru.gb.androidstart.notes.domain.NoteEntity;
 
-public class MainActivity extends AppCompatActivity implements NotesListFragment.Controller {
-
-    private NoteScreenFragment noteScreenFragment = new NoteScreenFragment();
-    private int notesListContainer;
-    private int noteScreenContainer;
+public class MainActivity extends AppCompatActivity implements NotesListFragment.OnFragmentSendDataListener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
     }
 
     private void openNotesList() {
+        int notesListContainer;
         if (isLandOrientation())
             notesListContainer = R.id.notes_list_fragment_container;
         else
@@ -37,18 +35,21 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
     }
 
     @Override
-    public void openNote() {
+    public void openNote(@Nullable NoteEntity note) {
+        NoteScreenFragment noteScreenFragment = new NoteScreenFragment();
+        int noteScreenContainer;
         if (isLandOrientation())
             noteScreenContainer = R.id.note_screen_fragment_container;
         else
             noteScreenContainer = R.id.portrait_orientation_fragment_container;
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            getSupportFragmentManager().popBackStack();
-        }
+//        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+//            getSupportFragmentManager().popBackStack();
+//        }
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(noteScreenContainer, noteScreenFragment)
                 .addToBackStack(null)
                 .commit();
+        noteScreenFragment.getNoteData(note);
     }
 }

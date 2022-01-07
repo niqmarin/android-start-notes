@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+
 import java.util.Date;
 
 import androidx.annotation.NonNull;
@@ -29,9 +31,10 @@ public class NotesListFragment extends Fragment {
     private RecyclerView notesRecyclerView;
     private NotesStorage notesStorage = new NotesStorageImpl();
     private NotesAdapter notesAdapter = new NotesAdapter();
+    private ExtendedFloatingActionButton addNoteButton;
     private FragmentManager fragmentManager;
 
-    private OnFragmentSendDataListener fragmentSendDataListener;
+    private OnFragmentOpenListener fragmentOpenListener;
 
     private static final String NOTES_LIST_KEY = "NOTES_LIST_KEY";
     private static final String NOTE_STORAGE_KEY = "NOTE_STORAGE_KEY";
@@ -40,7 +43,7 @@ public class NotesListFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         try {
-            fragmentSendDataListener = (OnFragmentSendDataListener) context;
+            fragmentOpenListener = (OnFragmentOpenListener) context;
         }
         catch (ClassCastException e) {
          throw new ClassCastException("Activity must implement OnFragmentSendDataListener");
@@ -77,6 +80,8 @@ public class NotesListFragment extends Fragment {
         notesRecyclerView.setAdapter(notesAdapter);
         notesAdapter.setData(notesStorage.getNotesList());
         notesAdapter.setOnItemClickListener(note -> onItemClick(note));
+        addNoteButton = view.findViewById(R.id.add_note_button);
+        addNoteButton.setOnClickListener(v -> fragmentOpenListener.openNote(null));
     }
 
     private void restoreNotesList() {
@@ -104,16 +109,21 @@ public class NotesListFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.add_note_menu) {
-            fragmentSendDataListener.openNote(null);
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.settings_menu:
+                fragmentOpenListener.openSettings();
+                return true;
+            case R.id.info_menu:
+                fragmentOpenListener.openInfo();
+                return true;
+            default:
+                super.onOptionsItemSelected(item);
+                return false;
         }
     }
 
     private void onItemClick(@NonNull NoteEntity note) {
-        fragmentSendDataListener.openNote(note);
+        fragmentOpenListener.openNote(note);
     }
 
     public void saveNoteChange(NoteEntity note) {
@@ -133,7 +143,9 @@ public class NotesListFragment extends Fragment {
         }
     }
 
-    interface OnFragmentSendDataListener {
+    interface OnFragmentOpenListener {
         void openNote(@Nullable NoteEntity note);
+        void openSettings();
+        void openInfo();
     }
 }

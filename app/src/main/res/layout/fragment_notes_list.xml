@@ -1,24 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     tools:context=".ui.NotesListFragment">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/notes_list_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:title="@string/toolbar_title"
-        app:titleTextColor="@color/grey_violet_600"
-        android:background="@color/light_violet_50"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/notes_list_recycle_view"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/recycle_item_note_layout"/>
+        android:orientation="vertical">
 
-</LinearLayout>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/notes_list_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light_violet_50"
+            app:title="@string/notes_list_toolbar_title"
+            app:titleTextColor="@color/grey_violet_600" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/notes_list_recycle_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/recycle_item_note_layout" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/add_note_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/margin_default"
+        app:icon="@drawable/ic_baseline_add_24"
+        android:shadowColor="@color/teal_700"
+        android:backgroundTint="@color/grey_violet_400"/>
+
+</FrameLayout>

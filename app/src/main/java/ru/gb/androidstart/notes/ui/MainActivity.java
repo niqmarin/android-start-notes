@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import ru.gb.androidstart.notes.R;
 import ru.gb.androidstart.notes.domain.NoteEntity;
 
@@ -15,7 +16,11 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
 
     private NotesListFragment notesListFragment;
 
+    private NoteScreenFragment currentNoteScreenFragment;
+
     private static final String NOTE_SCREEN_FRAGMENT_TAG = "NOTE_SCREEN_FRAGMENT_TAG";
+    private static final String SETTINGS_FRAGMENT_TAG = "SETTINGS_FRAGMENT_TAG";
+    private static final String INFO_FRAGMENT_TAG = "INFO_FRAGMENT_TAG";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
             settingsScreenContainer = R.id.portrait_orientation_fragment_container;
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(settingsScreenContainer, new SettingsFragment())
+                .add(settingsScreenContainer, new SettingsFragment(), SETTINGS_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }
@@ -84,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
             infoScreenContainer = R.id.portrait_orientation_fragment_container;
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(infoScreenContainer, new InfoFragment())
+                .add(infoScreenContainer, new InfoFragment(), INFO_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
     }
@@ -96,30 +101,44 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
 
     @Override
     public void onBackPressed() {
+        currentNoteScreenFragment = (NoteScreenFragment)getSupportFragmentManager().findFragmentByTag(NOTE_SCREEN_FRAGMENT_TAG);
+        Fragment settingsFragment = getSupportFragmentManager().findFragmentByTag(SETTINGS_FRAGMENT_TAG);
+        Fragment infoFragment = getSupportFragmentManager().findFragmentByTag(INFO_FRAGMENT_TAG);
 
-        if (getSupportFragmentManager().findFragmentByTag(NOTE_SCREEN_FRAGMENT_TAG) != null &&
-                getSupportFragmentManager().findFragmentByTag(NOTE_SCREEN_FRAGMENT_TAG).isVisible()) {
-            new AlertDialog.Builder(this)
-                    .setIcon(R.drawable.ic_baseline_save_dialog_24)
-                    .setTitle(" ")
-                    .setMessage(R.string.save_message_dialog)
-                    .setPositiveButton(R.string.positive_button_dialog, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            NoteEntity note = ((NoteScreenFragment)getSupportFragmentManager().findFragmentByTag(NOTE_SCREEN_FRAGMENT_TAG)).getCurrentNote();
-                            saveNote(note);
-                            getSupportFragmentManager().popBackStack();
-                        }
-                    })
-                    .setNegativeButton(R.string.negative_button_dialog, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            getSupportFragmentManager().popBackStack();
-                        }
-                    })
-                    .show();
+        if (isLandOrientation()) {
+            if (settingsFragment == null && infoFragment == null && currentNoteScreenFragment != null) {
+                showAlertDialog();
+            } else {
+                super.onBackPressed();
+            }
         } else {
-            super.onBackPressed();
+            if (currentNoteScreenFragment != null && currentNoteScreenFragment.isVisible()) {
+                showAlertDialog();
+            } else {
+                super.onBackPressed();
+            }
         }
+    }
+
+    private void showAlertDialog() {
+        new AlertDialog.Builder(this)
+                .setIcon(R.drawable.ic_baseline_save_dialog_24)
+                .setTitle(" ")
+                .setMessage(R.string.save_message_dialog)
+                .setPositiveButton(R.string.positive_button_dialog, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        saveNote(currentNoteScreenFragment.getCurrentNote());
+                        getSupportFragmentManager().popBackStack();
+                    }
+                })
+                .setNegativeButton(R.string.negative_button_dialog, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        getSupportFragmentManager().popBackStack();
+                    }
+                })
+                .show();
+
     }
 }

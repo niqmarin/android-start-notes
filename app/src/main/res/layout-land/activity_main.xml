@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/notes_list_fragment_container"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="3"/>
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/notes_list_fragment_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3" />
+
+        <FrameLayout
+            android:id="@+id/note_screen_fragment_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4" />
+
+    </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/note_screen_fragment_container"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="4"/>
+        android:id="@+id/menu_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
-</LinearLayout>
+</FrameLayout>

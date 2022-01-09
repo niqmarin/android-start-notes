@@ -1,25 +1,24 @@
 package ru.gb.androidstart.notes.ui;
 
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import ru.gb.androidstart.notes.R;
 import ru.gb.androidstart.notes.domain.NoteEntity;
 
 public class NotesAdapter extends RecyclerView.Adapter<NoteViewHolder> {
 
-    private OnItemClickListener clickListener = null;
+    private OnItemClickListener onItemClickListener;
 
     private ArrayList<NoteEntity> data = new ArrayList<>();
+
+    public NotesAdapter(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
 
     public void setData (ArrayList<NoteEntity> data) {
         Collections.reverse(data);
@@ -30,7 +29,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteViewHolder> {
     @NonNull
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new NoteViewHolder(parent, clickListener);
+        return new NoteViewHolder(parent, onItemClickListener);
     }
 
     @Override
@@ -47,11 +46,4 @@ public class NotesAdapter extends RecyclerView.Adapter<NoteViewHolder> {
         return data.size();
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        clickListener = listener;
-    }
-
-    interface OnItemClickListener {
-        void onItemClick(NoteEntity item);
-    }
 }

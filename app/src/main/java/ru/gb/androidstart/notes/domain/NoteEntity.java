@@ -7,20 +7,18 @@ import java.util.Date;
 
 public class NoteEntity implements Parcelable {
 
-    private int id;
+    private String id;
     private String title;
     private String contents;
     private Date date;
-    private static int counter = 0;
 
     public NoteEntity(String title, String contents, Date date) {
-        this.id = ++counter;
         this.title = title;
         this.contents = contents;
         this.date = date;
     }
 
-    public NoteEntity(int id, String title, String contents, Date date) {
+    public NoteEntity(String id, String title, String contents, Date date) {
         this.id = id;
         this.title = title;
         this.contents = contents;
@@ -28,7 +26,7 @@ public class NoteEntity implements Parcelable {
     }
 
     protected NoteEntity(Parcel in) {
-        id = in.readInt();
+        id = in.readString();
         title = in.readString();
         contents = in.readString();
         date = new Date();
@@ -47,11 +45,11 @@ public class NoteEntity implements Parcelable {
         }
     };
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -86,7 +84,7 @@ public class NoteEntity implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(id);
+        parcel.writeString(id);
         parcel.writeString(title);
         parcel.writeString(contents);
         parcel.writeLong(date.getTime());

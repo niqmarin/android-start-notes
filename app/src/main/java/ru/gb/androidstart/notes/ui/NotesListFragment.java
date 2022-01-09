@@ -1,21 +1,24 @@
 package ru.gb.androidstart.notes.ui;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.util.Date;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentResultListener;
@@ -28,18 +31,38 @@ import ru.gb.androidstart.notes.impl.NotesStorageImpl;
 
 public class NotesListFragment extends Fragment {
 
-    private RecyclerView notesRecycleView;
+    private RecyclerView notesRecyclerView;
     private NotesStorage notesStorage = new NotesStorageImpl();
-    private NotesAdapter notesAdapter = new NotesAdapter();
-    private FragmentManager fragmentManager;
-    private Date newNoteDate;
-    private String newNoteTitle;
-    private String newNoteContents;
+    private NotesAdapter notesAdapter = new NotesAdapter(new OnItemClickListener() {
+        @Override
+        public void onItemClick(NoteEntity note) {
+            fragmentOpenListener.openNote(note);
+        }
 
-    private int currentNoteID;
+        @Override
+        public void onItemLongClick(View view, NoteEntity note) {
+            showNotePopupMenu(view, note);
+        }
+    });
+
+    private ExtendedFloatingActionButton addNoteButton;
+    private FragmentManager fragmentManager;
+
+    private OnFragmentOpenListener fragmentOpenListener;
 
     private static final String NOTES_LIST_KEY = "NOTES_LIST_KEY";
     private static final String NOTE_STORAGE_KEY = "NOTE_STORAGE_KEY";
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            fragmentOpenListener = (OnFragmentOpenListener) context;
+        }
+        catch (ClassCastException e) {
+         throw new ClassCastException("Activity must implement OnFragmentSendDataListener");
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,30 +82,20 @@ public class NotesListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         restoreNotesList();
         initViews(view);
-        getNoteData();
     }
 
     private void initViews(View view) {
         ((AppCompatActivity)getActivity()).setSupportActionBar(view.findViewById(R.id.notes_list_toolbar));
-        notesRecycleView = view.findViewById(R.id.notes_list_recycle_view);
-        notesRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        notesRecycleView.setAdapter(notesAdapter);
+        notesRecyclerView = view.findViewById(R.id.notes_list_recycle_view);
+        notesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        notesRecyclerView.setAdapter(notesAdapter);
         notesAdapter.setData(notesStorage.getNotesList());
-        notesAdapter.setOnItemClickListener(item -> onItemClick(item));
-    }
 
-    private void getNoteData() {
-        fragmentManager.setFragmentResultListener(NoteScreenFragment.NOTE_DATA_OUT_KEY, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                newNoteDate = new Date(result.getLong(NoteScreenFragment.DATE_KEY, -1));
-                newNoteTitle = result.getString(NoteScreenFragment.TITLE_KEY);
-                newNoteContents = result.getString(NoteScreenFragment.CONTENTS_KEY);
-                saveNoteChange();
-            }
-        });
+        addNoteButton = view.findViewById(R.id.add_note_button);
+        addNoteButton.setOnClickListener(v -> fragmentOpenListener.openNote(null));
     }
 
     private void restoreNotesList() {
@@ -102,6 +115,28 @@ public class NotesListFragment extends Fragment {
         fragmentManager.setFragmentResult(NOTE_STORAGE_KEY, result);
     }
 
+    private void showNotePopupMenu(View anchorView, NoteEntity note) {
+        PopupMenu notePopupMenu = new PopupMenu(requireActivity(), anchorView);
+        notePopupMenu.inflate(R.menu.note_popup_menu);
+        notePopupMenu.setGravity(Gravity.RIGHT);
+        notePopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.edit_note_popup_menu:
+                        fragmentOpenListener.openNote(note);
+                        return true;
+                    case R.id.delete_note_popup_menu:
+                        deleteNote(note);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        notePopupMenu.show();
+    }
+
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         menu.clear();
@@ -110,53 +145,30 @@ public class NotesListFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.add_note_menu) {
-            currentNoteID = -1;
-            openNoteScreen(null);
-            return true;
+        switch (item.getItemId()) {
+            case R.id.settings_menu:
+                fragmentOpenListener.openSettings();
+                return true;
+            case R.id.info_menu:
+                fragmentOpenListener.openInfo();
+                return true;
+            default:
+                super.onOptionsItemSelected(item);
+                return false;
+        }
+    }
+
+    public void saveNoteChange(NoteEntity note) {
+        if (note.getId() == null) {
+            notesStorage.addNote(note);
         } else {
-            return super.onOptionsItemSelected(item);
+            notesStorage.editNote(note.getId(), note);
         }
+        notesAdapter.setData(notesStorage.getNotesList());
     }
 
-    private void onItemClick(NoteEntity item) {
-        currentNoteID = item.getId();
-        openNoteScreen(item);
-    }
-
-    private void openNoteScreen(@Nullable NoteEntity note) {
-        passNoteData(note);
-        if (!isLandOrientation()) {
-            fragmentManager
-                    .beginTransaction()
-                    .add(R.id.portrait_orientation_fragment_container, new NoteScreenFragment())
-                    .addToBackStack(null)
-                    .commit();
-        }
-    }
-
-    private void passNoteData(NoteEntity note) {
-        Bundle result = new Bundle();
-        if (note != null) {
-            result.putLong(NoteScreenFragment.DATE_KEY, note.getDate().getTime());
-            result.putString(NoteScreenFragment.TITLE_KEY, note.getTitle());
-            result.putString(NoteScreenFragment.CONTENTS_KEY, note.getContents());
-        } else {
-            result.putLong(NoteScreenFragment.DATE_KEY, new Date().getTime());
-            result.putString(NoteScreenFragment.TITLE_KEY, "");
-            result.putString(NoteScreenFragment.CONTENTS_KEY, "");
-        }
-        fragmentManager.setFragmentResult(NoteScreenFragment.NOTE_DATA_IN_KEY, result);
-    }
-
-    private void saveNoteChange() {
-        if (currentNoteID == -1) {
-            NoteEntity newNote = new NoteEntity(newNoteTitle, newNoteContents, newNoteDate);
-            notesStorage.addNote(newNote);
-        } else {
-            NoteEntity newNote = new NoteEntity(currentNoteID, newNoteTitle, newNoteContents, newNoteDate);
-            notesStorage.editNote(currentNoteID, newNote);
-        }
+    private void deleteNote(NoteEntity note) {
+        notesStorage.deleteNote(note.getId());
         notesAdapter.setData(notesStorage.getNotesList());
     }
 
@@ -168,7 +180,9 @@ public class NotesListFragment extends Fragment {
         }
     }
 
-    private boolean isLandOrientation(){
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    interface OnFragmentOpenListener {
+        void openNote(@Nullable NoteEntity note);
+        void openSettings();
+        void openInfo();
     }
 }

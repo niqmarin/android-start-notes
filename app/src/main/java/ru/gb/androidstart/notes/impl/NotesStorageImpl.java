@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import ru.gb.androidstart.notes.domain.NoteEntity;
 import ru.gb.androidstart.notes.domain.NotesStorage;
@@ -23,14 +24,17 @@ public class NotesStorageImpl implements NotesStorage {
 
     @Override
     public boolean addNote(NoteEntity note) {
+        if (note.getId() == null) {
+            note.setId(UUID.randomUUID().toString());
+        }
         tempNotesList.add(note);
         return true;
     }
 
     @Override
-    public boolean deleteNote(int id) {
+    public boolean deleteNote(String id) {
         for (int i = 0; i < tempNotesList.size(); i++) {
-            if (tempNotesList.get(i).getId() == id) {
+            if (tempNotesList.get(i).getId().equals(id)) {
                 tempNotesList.remove(i);
                 return true;
             }
@@ -39,7 +43,7 @@ public class NotesStorageImpl implements NotesStorage {
     }
 
     @Override
-    public boolean editNote(int id, NoteEntity note) {
+    public boolean editNote(String id, NoteEntity note) {
         deleteNote(id);
         tempNotesList.add(note);
         return true;

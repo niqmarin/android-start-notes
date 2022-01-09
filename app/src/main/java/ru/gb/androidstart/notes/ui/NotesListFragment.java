@@ -2,12 +2,14 @@ package ru.gb.androidstart.notes.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
@@ -16,6 +18,7 @@ import java.util.Date;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentResultListener;
@@ -30,7 +33,18 @@ public class NotesListFragment extends Fragment {
 
     private RecyclerView notesRecyclerView;
     private NotesStorage notesStorage = new NotesStorageImpl();
-    private NotesAdapter notesAdapter = new NotesAdapter();
+    private NotesAdapter notesAdapter = new NotesAdapter(new OnItemClickListener() {
+        @Override
+        public void onItemClick(NoteEntity note) {
+            fragmentOpenListener.openNote(note);
+        }
+
+        @Override
+        public void onItemLongClick(View view, NoteEntity note) {
+            showNotePopupMenu(view, note);
+        }
+    });
+
     private ExtendedFloatingActionButton addNoteButton;
     private FragmentManager fragmentManager;
 
@@ -79,7 +93,7 @@ public class NotesListFragment extends Fragment {
         notesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         notesRecyclerView.setAdapter(notesAdapter);
         notesAdapter.setData(notesStorage.getNotesList());
-        notesAdapter.setOnItemClickListener(note -> onItemClick(note));
+
         addNoteButton = view.findViewById(R.id.add_note_button);
         addNoteButton.setOnClickListener(v -> fragmentOpenListener.openNote(null));
     }
@@ -99,6 +113,28 @@ public class NotesListFragment extends Fragment {
         Bundle result = new Bundle();
         result.putParcelableArrayList(NOTES_LIST_KEY, notesStorage.getNotesList());
         fragmentManager.setFragmentResult(NOTE_STORAGE_KEY, result);
+    }
+
+    private void showNotePopupMenu(View anchorView, NoteEntity note) {
+        PopupMenu notePopupMenu = new PopupMenu(requireActivity(), anchorView);
+        notePopupMenu.inflate(R.menu.note_popup_menu);
+        notePopupMenu.setGravity(Gravity.RIGHT);
+        notePopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.edit_note_popup_menu:
+                        fragmentOpenListener.openNote(note);
+                        return true;
+                    case R.id.delete_note_popup_menu:
+                        deleteNote(note);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        notePopupMenu.show();
     }
 
     @Override
@@ -122,16 +158,17 @@ public class NotesListFragment extends Fragment {
         }
     }
 
-    private void onItemClick(@NonNull NoteEntity note) {
-        fragmentOpenListener.openNote(note);
-    }
-
     public void saveNoteChange(NoteEntity note) {
         if (note.getId() == null) {
             notesStorage.addNote(note);
         } else {
             notesStorage.editNote(note.getId(), note);
         }
+        notesAdapter.setData(notesStorage.getNotesList());
+    }
+
+    private void deleteNote(NoteEntity note) {
+        notesStorage.deleteNote(note.getId());
         notesAdapter.setData(notesStorage.getNotesList());
     }
 

@@ -6,4 +6,6 @@
     <string name="info_menu_title">О приложении</string>
     <string name="settings_toolbar_title">Настройки</string>
     <string name="info_toolbar_title">О приложении</string>
+    <string name="edit_note_popup_menu_title">Редактировать</string>
+    <string name="delete_note_popup_menu_title">Удалить</string>
 </resources>

@@ -1,6 +1,5 @@
 package ru.gb.androidstart.notes.ui;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,8 @@ public class NoteViewHolder extends RecyclerView.ViewHolder {
     private TextView dateTextView = itemView.findViewById(R.id.note_date_text_view);
     private NoteEntity note;
 
+    private OnItemClickListener onItemClickListener;
+
     private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
 
         @Override
@@ -31,9 +32,22 @@ public class NoteViewHolder extends RecyclerView.ViewHolder {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("d MMMM yyyy", myDateFormatSymbols);
 
-    public NoteViewHolder(@NonNull ViewGroup parent, NotesAdapter.OnItemClickListener clickListener) {
+    public NoteViewHolder(@NonNull ViewGroup parent, OnItemClickListener onItemClickListener) {
         super(LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_item_note_layout, parent, false));
-        itemView.setOnClickListener(v -> clickListener.onItemClick(note));
+
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemClickListener.onItemClick(note);
+            }
+        });
+        itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                onItemClickListener.onItemLongClick(view, note);
+                return true;
+            }
+        });
     }
 
     public void bind (NoteEntity note) {

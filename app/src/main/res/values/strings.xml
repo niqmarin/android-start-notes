@@ -15,4 +15,6 @@
     <string name="save_message_dialog">Сохранить изменения?</string>
     <string name="positive_button_dialog">Сохранить</string>
     <string name="negative_button_dialog">Не сохранять</string>
+
+    <string name="goodbye_message">Приложение прощается с вами</string>
 </resources>

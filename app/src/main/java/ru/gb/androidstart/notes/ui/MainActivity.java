@@ -3,6 +3,7 @@ package ru.gb.androidstart.notes.ui;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -140,5 +141,11 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
                 })
                 .show();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        Toast.makeText(this, R.string.goodbye_message, Toast.LENGTH_LONG).show();
+        super.onDestroy();
     }
 }

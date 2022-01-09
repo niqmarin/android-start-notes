@@ -109,6 +109,11 @@ public class NoteScreenFragment extends Fragment {
         fragmentSaveDataListener.saveNote(currentNote);
     }
 
+    public NoteEntity getCurrentNote() {
+        saveNoteData();
+        return currentNote;
+    }
+
     interface OnFragmentSaveDataListener {
         void saveNote(NoteEntity note);
     }

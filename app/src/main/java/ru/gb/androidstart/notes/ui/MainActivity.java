@@ -1,10 +1,12 @@
 package ru.gb.androidstart.notes.ui;
 
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import ru.gb.androidstart.notes.R;
 import ru.gb.androidstart.notes.domain.NoteEntity;
@@ -12,6 +14,8 @@ import ru.gb.androidstart.notes.domain.NoteEntity;
 public class MainActivity extends AppCompatActivity implements NotesListFragment.OnFragmentOpenListener, NoteScreenFragment.OnFragmentSaveDataListener {
 
     private NotesListFragment notesListFragment;
+
+    private static final String NOTE_SCREEN_FRAGMENT_TAG = "NOTE_SCREEN_FRAGMENT_TAG";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
 //        }
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(noteScreenContainer, noteScreenFragment)
+                .replace(noteScreenContainer, noteScreenFragment, NOTE_SCREEN_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
         noteScreenFragment.getNoteData(note);
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
             settingsScreenContainer = R.id.portrait_orientation_fragment_container;
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(settingsScreenContainer, new SettingsFragment())
+                .add(settingsScreenContainer, new SettingsFragment())
                 .addToBackStack(null)
                 .commit();
     }
@@ -80,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
             infoScreenContainer = R.id.portrait_orientation_fragment_container;
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(infoScreenContainer, new InfoFragment())
+                .add(infoScreenContainer, new InfoFragment())
                 .addToBackStack(null)
                 .commit();
     }
@@ -88,5 +92,34 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
     @Override
     public void saveNote(@NonNull NoteEntity note) {
         notesListFragment.saveNoteChange(note);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (getSupportFragmentManager().findFragmentByTag(NOTE_SCREEN_FRAGMENT_TAG) != null &&
+                getSupportFragmentManager().findFragmentByTag(NOTE_SCREEN_FRAGMENT_TAG).isVisible()) {
+            new AlertDialog.Builder(this)
+                    .setIcon(R.drawable.ic_baseline_save_dialog_24)
+                    .setTitle(" ")
+                    .setMessage(R.string.save_message_dialog)
+                    .setPositiveButton(R.string.positive_button_dialog, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            NoteEntity note = ((NoteScreenFragment)getSupportFragmentManager().findFragmentByTag(NOTE_SCREEN_FRAGMENT_TAG)).getCurrentNote();
+                            saveNote(note);
+                            getSupportFragmentManager().popBackStack();
+                        }
+                    })
+                    .setNegativeButton(R.string.negative_button_dialog, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            getSupportFragmentManager().popBackStack();
+                        }
+                    })
+                    .show();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

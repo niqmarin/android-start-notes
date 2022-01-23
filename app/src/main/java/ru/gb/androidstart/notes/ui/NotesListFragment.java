@@ -47,7 +47,6 @@ public class NotesListFragment extends Fragment {
     });
 
     private ExtendedFloatingActionButton addNoteButton;
-    private FragmentManager fragmentManager;
 
     private OnFragmentOpenListener fragmentOpenListener;
 
@@ -66,7 +65,6 @@ public class NotesListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentManager = requireActivity().getSupportFragmentManager();
         notesStorage = ((App)requireActivity().getApplication()).getNotesStorage();
         addTestNotes();
         setHasOptionsMenu(true);
@@ -87,7 +85,7 @@ public class NotesListFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        ((AppCompatActivity)getActivity()).setSupportActionBar(view.findViewById(R.id.notes_list_toolbar));
+        ((AppCompatActivity)requireActivity()).setSupportActionBar(view.findViewById(R.id.notes_list_toolbar));
         notesRecyclerView = view.findViewById(R.id.notes_list_recycle_view);
         notesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         notesRecyclerView.setAdapter(notesAdapter);
@@ -95,12 +93,6 @@ public class NotesListFragment extends Fragment {
 
         addNoteButton = view.findViewById(R.id.add_note_button);
         addNoteButton.setOnClickListener(v -> fragmentOpenListener.openNote(null));
-    }
-
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
     }
 
     private void showNotePopupMenu(View anchorView, NoteEntity note) {

@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import ru.gb.androidstart.notes.R;
+import ru.gb.androidstart.notes.databinding.ActivityMainBinding;
 import ru.gb.androidstart.notes.domain.NoteEntity;
 
 public class MainActivity extends AppCompatActivity implements NotesListFragment.OnFragmentOpenListener, NoteScreenFragment.OnFragmentSaveDataListener {
@@ -23,10 +24,13 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
     private static final String SETTINGS_FRAGMENT_TAG = "SETTINGS_FRAGMENT_TAG";
     private static final String INFO_FRAGMENT_TAG = "INFO_FRAGMENT_TAG";
 
+    private ActivityMainBinding binding;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         openNotesList();
     }
@@ -39,9 +43,10 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
         notesListFragment = new NotesListFragment();
         int notesListContainer;
         if (isLandOrientation())
-            notesListContainer = R.id.notes_list_fragment_container;
+            notesListContainer = binding.notesListFragmentContainer.getId();
         else
-            notesListContainer = R.id.portrait_orientation_fragment_container;
+            notesListContainer = binding.portraitOrientationFragmentContainer.getId();
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(notesListContainer, notesListFragment)
@@ -53,12 +58,10 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
         NoteScreenFragment noteScreenFragment = new NoteScreenFragment();
         int noteScreenContainer;
         if (isLandOrientation())
-            noteScreenContainer = R.id.note_screen_fragment_container;
+            noteScreenContainer = binding.noteScreenFragmentContainer.getId();
         else
-            noteScreenContainer = R.id.portrait_orientation_fragment_container;
-//        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-//            getSupportFragmentManager().popBackStack();
-//        }
+            noteScreenContainer = binding.portraitOrientationFragmentContainer.getId();
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(noteScreenContainer, noteScreenFragment, NOTE_SCREEN_FRAGMENT_TAG)
@@ -71,9 +74,10 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
     public void openSettings() {
         int settingsScreenContainer;
         if (isLandOrientation())
-            settingsScreenContainer = R.id.menu_fragment_container;
+            settingsScreenContainer = binding.menuFragmentContainer.getId();
         else
-            settingsScreenContainer = R.id.portrait_orientation_fragment_container;
+            settingsScreenContainer = binding.portraitOrientationFragmentContainer.getId();
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(settingsScreenContainer, new SettingsFragment(), SETTINGS_FRAGMENT_TAG)
@@ -85,9 +89,10 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
     public void openInfo() {
         int infoScreenContainer;
         if (isLandOrientation())
-            infoScreenContainer = R.id.menu_fragment_container;
+            infoScreenContainer = binding.menuFragmentContainer.getId();
         else
-            infoScreenContainer = R.id.portrait_orientation_fragment_container;
+            infoScreenContainer = binding.portraitOrientationFragmentContainer.getId();
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(infoScreenContainer, new InfoFragment(), INFO_FRAGMENT_TAG)

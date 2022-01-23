@@ -1,7 +1,4 @@
-package ru.gb.androidstart.notes.impl;
-
-import android.os.Parcel;
-import android.os.Parcelable;
+package ru.gb.androidstart.notes.data;
 
 import java.util.ArrayList;
 import java.util.UUID;

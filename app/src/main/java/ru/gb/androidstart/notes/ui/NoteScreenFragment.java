@@ -18,17 +18,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import ru.gb.androidstart.notes.R;
+import ru.gb.androidstart.notes.databinding.FragmentNoteScreenBinding;
 import ru.gb.androidstart.notes.domain.NoteEntity;
 
 public class NoteScreenFragment extends Fragment {
-    private ImageButton saveNoteButton;
-    private TextView dateTextView;
-    private EditText titleEditText;
-    private EditText contentsEditText;
-
     private NoteEntity currentNote = null;
 
     private OnFragmentSaveDataListener fragmentSaveDataListener;
+
+    private FragmentNoteScreenBinding binding;
 
     private static final DateFormatSymbols myDateFormatSymbols = new DateFormatSymbols() {
 
@@ -60,7 +58,8 @@ public class NoteScreenFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_note_screen, container, false);
+        binding = FragmentNoteScreenBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -72,22 +71,18 @@ public class NoteScreenFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        saveNoteButton = view.findViewById(R.id.save_note_button);
-        saveNoteButton.setOnClickListener(v -> saveNoteData());
-        dateTextView = view.findViewById(R.id.note_date_text_view);
-        titleEditText = view.findViewById(R.id.note_title_text_view);
-        contentsEditText = view.findViewById(R.id.note_contents_text_view);
+        binding.saveNoteButton.setOnClickListener(v -> saveNoteData());
     }
 
     private void fillNoteData() {
         if (currentNote == null) {
-            dateTextView.setText(dateTimeFormat.format(new Date()));
-            titleEditText.setText("");
-            contentsEditText.setText("");
+            binding.noteDateTextView.setText(dateTimeFormat.format(new Date()));
+            binding.noteTitleTextView.setText("");
+            binding.noteContentsTextView.setText("");
         } else {
-            dateTextView.setText(dateTimeFormat.format(currentNote.getDate()));
-            titleEditText.setText(currentNote.getTitle());
-            contentsEditText.setText(currentNote.getContents());
+            binding.noteDateTextView.setText(dateTimeFormat.format(currentNote.getDate()));
+            binding.noteTitleTextView.setText(currentNote.getTitle());
+            binding.noteContentsTextView.setText(currentNote.getContents());
         }
     }
 
@@ -97,14 +92,14 @@ public class NoteScreenFragment extends Fragment {
 
     private void saveNoteData() {
         if (currentNote == null) {
-            currentNote = new NoteEntity(titleEditText.getText().toString(),
-                    contentsEditText.getText().toString(),
+            currentNote = new NoteEntity(binding.noteTitleTextView.getText().toString(),
+                    binding.noteContentsTextView.getText().toString(),
                     new Date()
             );
         } else {
             currentNote.setDate(new Date());
-            currentNote.setTitle(titleEditText.getText().toString());
-            currentNote.setContents(contentsEditText.getText().toString());
+            currentNote.setTitle(binding.noteTitleTextView.getText().toString());
+            currentNote.setContents(binding.noteContentsTextView.getText().toString());
         }
         fragmentSaveDataListener.saveNote(currentNote);
     }

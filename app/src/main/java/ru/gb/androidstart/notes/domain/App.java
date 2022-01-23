@@ -2,7 +2,7 @@ package ru.gb.androidstart.notes.domain;
 
 import android.app.Application;
 
-import ru.gb.androidstart.notes.impl.NotesStorageImpl;
+import ru.gb.androidstart.notes.data.NotesStorageImpl;
 
 public class App extends Application {
 

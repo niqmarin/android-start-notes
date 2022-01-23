@@ -9,7 +9,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
@@ -20,19 +19,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ru.gb.androidstart.notes.R;
+import ru.gb.androidstart.notes.databinding.FragmentNotesListBinding;
 import ru.gb.androidstart.notes.domain.App;
 import ru.gb.androidstart.notes.domain.NoteEntity;
 import ru.gb.androidstart.notes.domain.NotesStorage;
-import ru.gb.androidstart.notes.impl.NotesStorageImpl;
 
 public class NotesListFragment extends Fragment {
 
-    private RecyclerView notesRecyclerView;
     private NotesStorage notesStorage;
     private NotesAdapter notesAdapter = new NotesAdapter(new OnItemClickListener() {
         @Override
@@ -46,9 +42,9 @@ public class NotesListFragment extends Fragment {
         }
     });
 
-    private ExtendedFloatingActionButton addNoteButton;
-
     private OnFragmentOpenListener fragmentOpenListener;
+
+    private FragmentNotesListBinding binding;
 
 
     @Override
@@ -73,7 +69,8 @@ public class NotesListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_notes_list, container, false);
+        binding = FragmentNotesListBinding.inflate(inflater, container,false);
+        return binding.getRoot();
 
     }
 
@@ -85,14 +82,12 @@ public class NotesListFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        ((AppCompatActivity)requireActivity()).setSupportActionBar(view.findViewById(R.id.notes_list_toolbar));
-        notesRecyclerView = view.findViewById(R.id.notes_list_recycle_view);
-        notesRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        notesRecyclerView.setAdapter(notesAdapter);
+        ((AppCompatActivity)requireActivity()).setSupportActionBar(binding.notesListToolbar);
+        binding.notesListRecycleView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.notesListRecycleView.setAdapter(notesAdapter);
         notesAdapter.setData(notesStorage.getNotesList());
 
-        addNoteButton = view.findViewById(R.id.add_note_button);
-        addNoteButton.setOnClickListener(v -> fragmentOpenListener.openNote(null));
+        binding.addNoteButton.setOnClickListener(v -> fragmentOpenListener.openNote(null));
     }
 
     private void showNotePopupMenu(View anchorView, NoteEntity note) {

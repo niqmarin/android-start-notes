@@ -19,10 +19,14 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
     private NotesListFragment notesListFragment;
 
     private NoteScreenFragment currentNoteScreenFragment;
-
     private static final String NOTE_SCREEN_FRAGMENT_TAG = "NOTE_SCREEN_FRAGMENT_TAG";
+
     private static final String SETTINGS_FRAGMENT_TAG = "SETTINGS_FRAGMENT_TAG";
     private static final String INFO_FRAGMENT_TAG = "INFO_FRAGMENT_TAG";
+
+    private String currentFragmentTag = null;
+
+    private static final String CURRENT_FRAGMENT_TAG_KEY = "CURRENT_FRAGMENT_TAG_KEY";
 
     private ActivityMainBinding binding;
 
@@ -32,11 +36,37 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        openNotesList();
+        if (savedInstanceState != null) {
+            currentFragmentTag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG_KEY);
+        }
+
+        openFragment(currentFragmentTag);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(CURRENT_FRAGMENT_TAG_KEY, currentFragmentTag);
     }
 
     private boolean isLandOrientation(){
         return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    }
+
+    private void openFragment(@Nullable String currentFragmentTag) {
+        openNotesList();
+        if (currentFragmentTag != null) {
+            switch (currentFragmentTag) {
+                case SETTINGS_FRAGMENT_TAG:
+                    openSettings();
+                    break;
+                case INFO_FRAGMENT_TAG:
+                    openInfo();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     private void openNotesList() {
@@ -67,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
                 .replace(noteScreenContainer, noteScreenFragment, NOTE_SCREEN_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
+
         noteScreenFragment.getNoteData(note);
     }
 
@@ -83,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
                 .add(settingsScreenContainer, new SettingsFragment(), SETTINGS_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
+
+        currentFragmentTag = SETTINGS_FRAGMENT_TAG;
     }
 
     @Override
@@ -98,6 +131,8 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
                 .add(infoScreenContainer, new InfoFragment(), INFO_FRAGMENT_TAG)
                 .addToBackStack(null)
                 .commit();
+
+        currentFragmentTag = INFO_FRAGMENT_TAG;
     }
 
     @Override
@@ -108,11 +143,12 @@ public class MainActivity extends AppCompatActivity implements NotesListFragment
     @Override
     public void onBackPressed() {
         currentNoteScreenFragment = (NoteScreenFragment)getSupportFragmentManager().findFragmentByTag(NOTE_SCREEN_FRAGMENT_TAG);
-        Fragment settingsFragment = getSupportFragmentManager().findFragmentByTag(SETTINGS_FRAGMENT_TAG);
-        Fragment infoFragment = getSupportFragmentManager().findFragmentByTag(INFO_FRAGMENT_TAG);
+        Fragment menuLandFragment = getSupportFragmentManager().findFragmentById(binding.menuFragmentContainer.getId());
+
+        currentFragmentTag = null;
 
         if (isLandOrientation()) {
-            if (settingsFragment == null && infoFragment == null && currentNoteScreenFragment != null) {
+            if (menuLandFragment == null && currentNoteScreenFragment != null) {
                 showAlertDialog();
             } else {
                 super.onBackPressed();

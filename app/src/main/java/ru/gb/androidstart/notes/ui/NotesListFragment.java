@@ -25,6 +25,7 @@ import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import ru.gb.androidstart.notes.R;
+import ru.gb.androidstart.notes.domain.App;
 import ru.gb.androidstart.notes.domain.NoteEntity;
 import ru.gb.androidstart.notes.domain.NotesStorage;
 import ru.gb.androidstart.notes.impl.NotesStorageImpl;
@@ -32,7 +33,7 @@ import ru.gb.androidstart.notes.impl.NotesStorageImpl;
 public class NotesListFragment extends Fragment {
 
     private RecyclerView notesRecyclerView;
-    private NotesStorage notesStorage = new NotesStorageImpl();
+    private NotesStorage notesStorage;
     private NotesAdapter notesAdapter = new NotesAdapter(new OnItemClickListener() {
         @Override
         public void onItemClick(NoteEntity note) {
@@ -50,8 +51,6 @@ public class NotesListFragment extends Fragment {
 
     private OnFragmentOpenListener fragmentOpenListener;
 
-    private static final String NOTES_LIST_KEY = "NOTES_LIST_KEY";
-    private static final String NOTE_STORAGE_KEY = "NOTE_STORAGE_KEY";
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -68,6 +67,7 @@ public class NotesListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fragmentManager = requireActivity().getSupportFragmentManager();
+        notesStorage = ((App)requireActivity().getApplication()).getNotesStorage();
         addTestNotes();
         setHasOptionsMenu(true);
     }
@@ -83,7 +83,6 @@ public class NotesListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        restoreNotesList();
         initViews(view);
     }
 
@@ -98,21 +97,10 @@ public class NotesListFragment extends Fragment {
         addNoteButton.setOnClickListener(v -> fragmentOpenListener.openNote(null));
     }
 
-    private void restoreNotesList() {
-        fragmentManager.setFragmentResultListener(NOTE_STORAGE_KEY, this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                notesStorage.setNotesList(result.getParcelableArrayList(NOTES_LIST_KEY));
-            }
-        });
-    }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Bundle result = new Bundle();
-        result.putParcelableArrayList(NOTES_LIST_KEY, notesStorage.getNotesList());
-        fragmentManager.setFragmentResult(NOTE_STORAGE_KEY, result);
     }
 
     private void showNotePopupMenu(View anchorView, NoteEntity note) {
